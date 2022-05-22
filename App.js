@@ -1,52 +1,47 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Button, TextInput,ScrollView,FlatList } from 'react-native';
+import { StyleSheet, View,FlatList } from 'react-native';
 import { useState } from 'react';
+import GoalItem from './components/GoalItem';
+import ToolBar from './components/ToolBar';
 
 export default function App() {
-  const [text,setText]=useState('');
+  
   const [listOfGoals,setListOfGoals]=useState([]);
 
-  const goalInputH =(enteredText)=>{
-    // console.log(enteredText);
-    setText(enteredText);
+
+
+  const addGoalH = (text)=>{
+
+    setListOfGoals(currentListOfGoals=>[
+      ...currentListOfGoals,
+        {
+          text:text, 
+          key:Math.random().toString()
+        }
+      ]);
   }
 
-  const addGoalH = ()=>{
-    setListOfGoals(currentListOfGoals=>[...currentListOfGoals,{text:text,key:currentListOfGoals.length+1}]);
-    setText('');
+  const deleteGoal=(index)=>{
+    setListOfGoals((currentListOfGoals)=>{
+      return currentListOfGoals.filter(
+        goal => goal.key!==currentListOfGoals[index].key
+        )
+    })
   }
-
   return (
     <View style={styles.appContainer}>
-     <View style={styles.toolBar}> 
-      <TextInput 
-      style={styles.textInput}
-      onChangeText={goalInputH}
-      placeholder='Your course Goals'
-      value={text}
-      />
-      <Button 
-      title='Add Goal'
-      onPress={addGoalH}
-      />
-     </View>
+     <ToolBar onAddGoal={addGoalH}/>
      <View style={styles.list}>
        <FlatList 
        data={listOfGoals}
-       keyExtractor={(item,index)=>{
-         return item.key
-       }}
+      //  keyExtractor={(item,index)=>(item.key)}
        renderItem={goal=>{
-          return (
-            <View style={styles.goal} key={goal.item.key}>
-            <Text style={styles.goalText}>{goal.item.key +". " + goal.item.text}</Text>
-            </View>
-        
-          )
+          return <GoalItem 
+          text={goal.item.text} 
+          index={goal.index+1}
+          onDelete={deleteGoal}/>
         }}
        />
-
-      
      </View>
       <StatusBar style="auto"/>
     </View>
@@ -64,32 +59,5 @@ const styles = StyleSheet.create({
     // alignItems:'center',
     // padding:50,
     justifyContent:'flex-start'
-  },
-  toolBar:{
-    flex:1,
-    flexDirection:'row',
-    alignItems:'center',
-    justifyContent:'space-around',
-  },
-  textInput:{
-    borderWidth:1,
-    borderColor:'#ccc',
-    width:'60%',
-    padding:5,
-    marginRight:8
-  },
-  goal:{
-    paddingVertical:5,
-    paddingHorizontal:10,
-    marginVertical:3,
-    borderLeftWidth:2,
-    borderLeftColor:'cyan',
-    borderRadius:10,
-    fontWeight:'900',
-    backgroundColor:'grey'
-
-  },
-  goalText:{
-    color:'white'
   }
 });
